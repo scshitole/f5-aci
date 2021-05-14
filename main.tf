@@ -12,26 +12,13 @@ provider "bigip" {
   address  = var.address
   username = var.username
   password = var.password
-  port = var.port
+  port     = var.port
 }
 
 module "bigip_vlan_selfip" {
- source = "./modules/vlan_selfip"
- }
-
-data "template_file" "init" {
-  template = "${file("as3.tpl")}"
-  vars = {
-    TENANT = var.tenant
-    APPLICATION = var.application
-    VIP_ADDRESS = var.vip_address
-    SERVER1 = var.server1
-    SERVER2 = var.server2
-  }
+  source = "./modules/vlan_selfip"
 }
 
-//deploy an application using AS3
-resource "bigip_as3"  "as3-example1" {
-     as3_json = data.template_file.init.rendered
-     depends_on = ["module.bigip_vlan_selfip"]
- }
+module "as3_http_app" {
+  source = "./modules/as3http"
+}
